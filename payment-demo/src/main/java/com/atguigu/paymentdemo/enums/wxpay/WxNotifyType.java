@@ -3,9 +3,6 @@ package com.atguigu.paymentdemo.enums.wxpay;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 商户平台负责的api
- */
 @AllArgsConstructor
 @Getter
 public enum WxNotifyType {
@@ -16,7 +13,7 @@ public enum WxNotifyType {
 	NATIVE_NOTIFY("/api/wx-pay/native/notify"),
 
 	/**
-	 * 支付通知
+	 * 支付通知V2
 	 */
 	NATIVE_NOTIFY_V2("/api/wx-pay-v2/native/notify"),
 

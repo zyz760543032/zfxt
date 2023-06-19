@@ -3,9 +3,6 @@ package com.atguigu.paymentdemo.enums.wxpay;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 微信支付平台负责的api
- */
 @AllArgsConstructor
 @Getter
 public enum WxApiType {
@@ -16,7 +13,7 @@ public enum WxApiType {
 	NATIVE_PAY("/v3/pay/transactions/native"),
 
 	/**
-	 * Native下单
+	 * Native下单V2
 	 */
 	NATIVE_PAY_V2("/pay/unifiedorder"),
 

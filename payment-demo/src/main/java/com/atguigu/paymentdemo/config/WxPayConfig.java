@@ -1,7 +1,11 @@
 package com.atguigu.paymentdemo.config;
 
+
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
-import com.wechat.pay.contrib.apache.httpclient.auth.*;
+import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
+import com.wechat.pay.contrib.apache.httpclient.auth.ScheduledUpdateCertificatesVerifier;
+import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Credentials;
+import com.wechat.pay.contrib.apache.httpclient.auth.WechatPay2Validator;
 import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 
-
 @Configuration
 @PropertySource("classpath:wxpay.properties") //读取配置文件
 @ConfigurationProperties(prefix="wxpay") //读取wxpay节点
@@ -24,30 +27,22 @@ import java.security.PrivateKey;
 @Slf4j
 public class WxPayConfig {
 
-    /**
-     * 商户号
-     */
+    // 商户号
     private String mchId;
 
-    /**
-     * 商户API证书序列号
-     */
+    // 商户API证书序列号
     private String mchSerialNo;
 
     // 商户私钥文件
     private String privateKeyPath;
 
-    /**
-     * APIv3密钥
-     */
+    // APIv3密钥
     private String apiV3Key;
 
     // APPID
     private String appid;
 
-    /**
-     * 微信服务器地址
-     */
+    // 微信服务器地址
     private String domain;
 
     // 接收结果通知地址
@@ -61,7 +56,7 @@ public class WxPayConfig {
      * @param filename
      * @return
      */
-    private PrivateKey getPrivateKey(String filename){
+    public PrivateKey getPrivateKey(String filename){
 
         try {
             return PemUtil.loadPrivateKey(new FileInputStream(filename));

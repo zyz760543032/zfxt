@@ -4,6 +4,7 @@ import com.atguigu.paymentdemo.config.WxPayConfig;
 import com.atguigu.paymentdemo.entity.OrderInfo;
 import com.atguigu.paymentdemo.entity.RefundInfo;
 import com.atguigu.paymentdemo.enums.OrderStatus;
+import com.atguigu.paymentdemo.enums.PayType;
 import com.atguigu.paymentdemo.enums.wxpay.WxApiType;
 import com.atguigu.paymentdemo.enums.wxpay.WxNotifyType;
 import com.atguigu.paymentdemo.enums.wxpay.WxRefundStatus;
@@ -63,7 +64,7 @@ public class WxPayServiceImpl implements WxPayService {
 
 
     /**
-     * 若productId对应订单存在则返回该订单，否则根据productId对应商品信息生成新订单。根据订单信息和配置属性向微信平台请求生成二维码。
+     * 创建订单，调用Native支付接口
      * @param productId
      * @return code_url 和 订单号
      * @throws Exception
@@ -74,12 +75,10 @@ public class WxPayServiceImpl implements WxPayService {
 
         log.info("生成订单");
 
-        //若productId对应订单存在则返回该订单，否则根据productId对应商品信息生成新订单
-        OrderInfo orderInfo = orderInfoService.createOrderByProductId(productId);
-
+        //生成订单
+        OrderInfo orderInfo = orderInfoService.createOrderByProductId(productId, PayType.WXPAY.getType());
         String codeUrl = orderInfo.getCodeUrl();
-
-        if(!StringUtils.isEmpty(codeUrl)){
+        if(orderInfo != null && !StringUtils.isEmpty(codeUrl)){
             log.info("订单已存在，二维码已保存");
             //返回二维码
             Map<String, Object> map = new HashMap<>();
@@ -88,20 +87,22 @@ public class WxPayServiceImpl implements WxPayService {
             return map;
         }
 
+
         log.info("调用统一下单API");
+
         //调用统一下单API
         HttpPost httpPost = new HttpPost(wxPayConfig.getDomain().concat(WxApiType.NATIVE_PAY.getType()));
 
         // 请求body参数
         Gson gson = new Gson();
-        Map<String, Object> paramsMap = new HashMap<>();
+        Map paramsMap = new HashMap();
         paramsMap.put("appid", wxPayConfig.getAppid());
         paramsMap.put("mchid", wxPayConfig.getMchId());
         paramsMap.put("description", orderInfo.getTitle());
         paramsMap.put("out_trade_no", orderInfo.getOrderNo());
         paramsMap.put("notify_url", wxPayConfig.getNotifyDomain().concat(WxNotifyType.NATIVE_NOTIFY.getType()));
 
-        Map<String, Object> amountMap = new HashMap<>();
+        Map amountMap = new HashMap();
         amountMap.put("total", orderInfo.getTotalFee());
         amountMap.put("currency", "CNY");
 
@@ -117,9 +118,9 @@ public class WxPayServiceImpl implements WxPayService {
         httpPost.setHeader("Accept", "application/json");
 
         //完成签名并执行请求
+        CloseableHttpResponse response = wxPayClient.execute(httpPost);
 
-        try (CloseableHttpResponse response = wxPayClient.execute(httpPost)) {
-
+        try {
             String bodyAsString = EntityUtils.toString(response.getEntity());//响应体
             int statusCode = response.getStatusLine().getStatusCode();//响应状态码
             if (statusCode == 200) { //处理成功
@@ -127,7 +128,7 @@ public class WxPayServiceImpl implements WxPayService {
             } else if (statusCode == 204) { //处理成功，无返回Body
                 log.info("成功");
             } else {
-                log.info("Native下单失败,响应码 = " + statusCode + ",返回结果 = " + bodyAsString);
+                log.info("Native下单失败,响应码 = " + statusCode+ ",返回结果 = " + bodyAsString);
                 throw new IOException("request failed");
             }
 
@@ -147,6 +148,8 @@ public class WxPayServiceImpl implements WxPayService {
 
             return map;
 
+        } finally {
+            response.close();
         }
     }
 
@@ -580,7 +583,7 @@ public class WxPayServiceImpl implements WxPayService {
         log.info("生成订单");
 
         //生成订单
-        OrderInfo orderInfo = orderInfoService.createOrderByProductId(productId);
+        OrderInfo orderInfo = orderInfoService.createOrderByProductId(productId, PayType.WXPAY.getType());
         String codeUrl = orderInfo.getCodeUrl();
         if(orderInfo != null && !StringUtils.isEmpty(codeUrl)){
             log.info("订单已存在，二维码已保存");

@@ -2,9 +2,11 @@ package com.atguigu.paymentdemo;
 
 import com.atguigu.paymentdemo.config.WxPayConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.security.PrivateKey;
 
 @SpringBootTest
 class PaymentDemoApplicationTests {
@@ -18,7 +20,7 @@ class PaymentDemoApplicationTests {
     /**
      * 获取商户的私钥
      */
-    /*@Test
+    @Test
     void testGetPrivateKey() {
 
         //获取私钥路径
@@ -29,6 +31,6 @@ class PaymentDemoApplicationTests {
 
         System.out.println(privateKey);
 
-    }*/
+    }
 
 }

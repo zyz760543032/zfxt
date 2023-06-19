@@ -3,9 +3,6 @@ package com.atguigu.paymentdemo.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 用户与商户平台
- */
 @AllArgsConstructor
 @Getter
 public enum OrderStatus {

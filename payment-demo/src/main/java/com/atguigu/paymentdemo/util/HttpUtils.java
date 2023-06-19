@@ -4,9 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-/**
- * 读取微信支付平台向商户平台发送的消息
- */
+
 public class HttpUtils {
 
     /**

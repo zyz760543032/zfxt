@@ -5,27 +5,32 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum WxTradeState {
+public enum AliPayTradeState {
 
     /**
      * 支付成功
      */
-    SUCCESS("SUCCESS"),
+    SUCCESS("TRADE_SUCCESS"),
 
     /**
      * 未支付
      */
-    NOTPAY("NOTPAY"),
+    NOTPAY("WAIT_BUYER_PAY"),
 
     /**
      * 已关闭
      */
-    CLOSED("CLOSED"),
+    CLOSED("TRADE_CLOSED"),
 
     /**
-     * 转入退款
+     * 退款成功
      */
-    REFUND("REFUND");
+    REFUND_SUCCESS("REFUND_SUCCESS"),
+
+    /**
+     * 退款失败
+     */
+    REFUND_ERROR("REFUND_ERROR");
 
     /**
      * 类型

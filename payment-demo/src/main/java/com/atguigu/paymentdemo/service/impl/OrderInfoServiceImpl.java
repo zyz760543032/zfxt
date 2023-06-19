@@ -28,10 +28,10 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     private OrderInfoMapper orderInfoMapper;*/
 
     @Override
-    public OrderInfo createOrderByProductId(Long productId) {
+    public OrderInfo createOrderByProductId(Long productId, String paymentType) {
 
         //查找已存在但未支付的订单
-        OrderInfo orderInfo = this.getNoPayOrderByProductId(productId);
+        OrderInfo orderInfo = this.getNoPayOrderByProductId(productId, paymentType);
         if( orderInfo != null){
             return orderInfo;
         }
@@ -45,7 +45,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         orderInfo.setOrderNo(OrderNoUtils.getOrderNo()); //订单号
         orderInfo.setProductId(productId);
         orderInfo.setTotalFee(product.getPrice()); //分
-        orderInfo.setOrderStatus(OrderStatus.NOTPAY.getType());
+        orderInfo.setOrderStatus(OrderStatus.NOTPAY.getType()); //未支付
+        orderInfo.setPaymentType(paymentType);
         baseMapper.insert(orderInfo);
 
         return orderInfo;
@@ -121,13 +122,14 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
      * @return
      */
     @Override
-    public List<OrderInfo> getNoPayOrderByDuration(int minutes) {
+    public List<OrderInfo> getNoPayOrderByDuration(int minutes, String paymentType) {
 
         Instant instant = Instant.now().minus(Duration.ofMinutes(minutes));
 
         QueryWrapper<OrderInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("order_status", OrderStatus.NOTPAY.getType());
         queryWrapper.le("create_time", instant);
+        queryWrapper.eq("payment_type", paymentType);
 
         List<OrderInfo> orderInfoList = baseMapper.selectList(queryWrapper);
 
@@ -156,11 +158,12 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
      * @param productId
      * @return
      */
-    private OrderInfo getNoPayOrderByProductId(Long productId) {
+    private OrderInfo getNoPayOrderByProductId(Long productId, String paymentType) {
 
         QueryWrapper<OrderInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("product_id", productId);
         queryWrapper.eq("order_status", OrderStatus.NOTPAY.getType());
+        queryWrapper.eq("payment_type", paymentType);
 //        queryWrapper.eq("user_id", userId);
         OrderInfo orderInfo = baseMapper.selectOne(queryWrapper);
         return orderInfo;
